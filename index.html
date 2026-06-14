@@ -1,0 +1,2199 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EPIC Rentals – Game On, Chennai!</title>
+  <meta name="description" content="Rent PS5 consoles, controllers and games in Chennai. Delivered to your doorstep." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
+<style>
+/* ============================================================
+   TOKENS
+============================================================ */
+:root {
+  --orange:       #f97316;
+  --orange-glow:  rgba(249,115,22,0.35);
+  --orange-dim:   rgba(249,115,22,0.12);
+  --font-display: 'Exo 2', sans-serif;
+  --font-body:    'Inter', sans-serif;
+  --radius-sm: 8px; --radius-md: 14px; --radius-lg: 22px;
+  --transition: 0.22s ease;
+}
+[data-theme="dark"] {
+  --bg:#0d0d0f; --bg-card:#141418; --bg-input:#1a1a1f; --bg-hover:#1f1f26;
+  --border:rgba(255,255,255,0.08); --border-hi:rgba(249,115,22,0.5);
+  --text-1:#f0f0f5; --text-2:#9a9aaf; --text-3:#5a5a72;
+  --success:#22c55e; --success-bg:rgba(34,197,94,0.1);
+  --danger:#ef4444;  --danger-bg:rgba(239,68,68,0.1);
+  --warn:#f59e0b;    --warn-bg:rgba(245,158,11,0.1);
+  --info:#38bdf8;    --info-bg:rgba(56,189,248,0.1);
+  --shadow:0 4px 24px rgba(0,0,0,0.6);
+  --shadow-glow:0 0 32px rgba(249,115,22,0.18);
+}
+[data-theme="light"] {
+  --bg:#f5f5fa; --bg-card:#ffffff; --bg-input:#efeff5; --bg-hover:#e8e8f0;
+  --border:rgba(0,0,0,0.09); --border-hi:rgba(249,115,22,0.5);
+  --text-1:#111118; --text-2:#5a5a72; --text-3:#9a9ab0;
+  --success:#16a34a; --success-bg:rgba(22,163,74,0.1);
+  --danger:#dc2626;  --danger-bg:rgba(220,38,38,0.1);
+  --warn:#d97706;    --warn-bg:rgba(217,119,6,0.1);
+  --info:#0369a1;    --info-bg:rgba(3,105,161,0.1);
+  --shadow:0 4px 20px rgba(0,0,0,0.1);
+  --shadow-glow:0 0 32px rgba(249,115,22,0.1);
+}
+
+/* ============================================================
+   RESET
+============================================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text-1);min-height:100vh;transition:background var(--transition),color var(--transition);overflow-x:hidden;}
+h1,h2,h3,h4{font-family:var(--font-display);}
+a{color:var(--orange);text-decoration:none;}
+a:hover{text-decoration:underline;}
+button{cursor:pointer;font-family:var(--font-body);border:none;}
+input,select,textarea{font-family:var(--font-body);background:var(--bg-input);color:var(--text-1);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;font-size:14px;width:100%;transition:border-color var(--transition);outline:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--orange);}
+select option{background:var(--bg-card);}
+label{font-size:13px;color:var(--text-2);display:block;margin-bottom:5px;font-weight:500;}
+input[type="checkbox"]{width:auto;accent-color:var(--orange);}
+input[type="number"]{width:100%;}
+
+/* ============================================================
+   LAYOUT UTILS
+============================================================ */
+.container{max-width:1100px;margin:0 auto;padding:0 20px;}
+.hidden{display:none!important;}
+.flex{display:flex;}.flex-col{flex-direction:column;}
+.items-center{align-items:center;}.justify-between{justify-content:space-between;}
+.gap-2{gap:8px;}.gap-3{gap:12px;}.gap-4{gap:16px;}.gap-6{gap:24px;}
+.mt-2{margin-top:8px;}.mt-4{margin-top:16px;}.mt-6{margin-top:24px;}
+.mb-2{margin-bottom:8px;}.mb-4{margin-bottom:16px;}.mb-6{margin-bottom:24px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.w-full{width:100%;}.text-center{text-align:center;}
+.text-sm{font-size:13px;}.text-xs{font-size:11px;}.text-lg{font-size:18px;}
+.text-orange{color:var(--orange);}.text-muted{color:var(--text-2);}
+.font-bold{font-weight:700;}.font-display{font-family:var(--font-display);}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;}
+
+/* ============================================================
+   CARDS
+============================================================ */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;transition:box-shadow var(--transition),border-color var(--transition);}
+.card:hover{border-color:var(--border-hi);box-shadow:var(--shadow-glow);}
+.card-flat{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;}
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 22px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;transition:all var(--transition);white-space:nowrap;}
+.btn-primary{background:var(--orange);color:#fff;box-shadow:0 0 18px var(--orange-glow);}
+.btn-primary:hover{opacity:0.88;box-shadow:0 0 28px var(--orange-glow);}
+.btn-ghost{background:transparent;color:var(--text-1);border:1px solid var(--border);}
+.btn-ghost:hover{background:var(--bg-hover);border-color:var(--orange);}
+.btn-danger{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger);}
+.btn-danger:hover{background:var(--danger);color:#fff;}
+.btn-success{background:var(--success-bg);color:var(--success);border:1px solid var(--success);}
+.btn-success:hover{background:var(--success);color:#fff;}
+.btn-info{background:var(--info-bg);color:var(--info);border:1px solid var(--info);}
+.btn-info:hover{background:var(--info);color:#fff;}
+.btn-sm{padding:7px 13px;font-size:12px;}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+/* ============================================================
+   BADGES
+============================================================ */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;}
+.badge-available{background:var(--success-bg);color:var(--success);}
+.badge-rented{background:var(--danger-bg);color:var(--danger);}
+.badge-maintenance{background:var(--warn-bg);color:var(--warn);}
+.badge-pending{background:var(--warn-bg);color:var(--warn);}
+.badge-confirmed{background:var(--success-bg);color:var(--success);}
+.badge-rejected{background:var(--danger-bg);color:var(--danger);}
+
+/* ============================================================
+   TOAST
+============================================================ */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg-card);border:1px solid var(--border);border-left:4px solid var(--orange);padding:14px 24px;border-radius:var(--radius-md);font-size:14px;box-shadow:var(--shadow);z-index:9999;transition:transform 0.3s ease;max-width:360px;text-align:center;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-left-color:var(--danger);}
+#toast.success{border-left-color:var(--success);}
+
+/* ============================================================
+   MODALS
+============================================================ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
+.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow);}
+.modal-lg{max-width:720px;}
+.modal-title{font-family:var(--font-display);font-size:20px;font-weight:700;margin-bottom:20px;color:var(--text-1);}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;}
+.modal-section-label{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+
+/* ============================================================
+   TABLE
+============================================================ */
+.table-wrap{overflow-x:auto;border-radius:var(--radius-md);border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{background:var(--bg-hover);}
+th{text-align:left;padding:12px 14px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-2);border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:12px 14px;border-bottom:1px solid var(--border);color:var(--text-1);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--bg-hover);}
+
+/* ============================================================
+   FLATPICKR DARK
+============================================================ */
+[data-theme="dark"] .flatpickr-calendar{background:var(--bg-card)!important;border-color:var(--border)!important;box-shadow:var(--shadow)!important;color:var(--text-1)!important;}
+[data-theme="dark"] .flatpickr-day{color:var(--text-1)!important;}
+[data-theme="dark"] .flatpickr-day.selected{background:var(--orange)!important;border-color:var(--orange)!important;}
+[data-theme="dark"] .flatpickr-day:hover{background:var(--bg-hover)!important;}
+[data-theme="dark"] .flatpickr-months{background:var(--bg-card)!important;}
+[data-theme="dark"] .flatpickr-monthDropdown-months,[data-theme="dark"] .flatpickr-current-month{color:var(--text-1)!important;}
+[data-theme="dark"] .flatpickr-weekday{color:var(--text-2)!important;}
+[data-theme="dark"] .flatpickr-day.flatpickr-disabled{color:var(--text-3)!important;}
+[data-theme="dark"] .flatpickr-prev-month svg,[data-theme="dark"] .flatpickr-next-month svg{fill:var(--text-2)!important;}
+
+/* ============================================================
+   SCHEDULE CALENDAR
+============================================================ */
+.epic-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;}
+.epic-cal-title{font-family:var(--font-display);font-size:18px;font-weight:700;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-day-name{text-align:center;font-size:11px;font-weight:600;color:var(--text-3);padding:6px 0;text-transform:uppercase;}
+.cal-cell{min-height:70px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px;position:relative;font-size:12px;background:var(--bg-card);}
+.cal-cell.today{border-color:var(--orange);}
+.cal-cell.other-month{background:var(--bg);opacity:0.5;}
+.cal-date{font-weight:600;font-size:11px;margin-bottom:3px;color:var(--text-2);}
+.cal-event{font-size:10px;padding:2px 5px;border-radius:4px;margin-top:2px;line-height:1.4;word-break:break-word;cursor:pointer;color:#fff;}
+.cal-legend{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;align-items:center;}
+.cal-legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-2);}
+.cal-legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+
+/* ============================================================
+   NAV
+============================================================ */
+.nav{position:sticky;top:0;z-index:100;background:rgba(13,13,15,0.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 20px;}
+[data-theme="light"] .nav{background:rgba(245,245,250,0.88);}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:62px;}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none!important;}
+.nav-logo img{height:42px;width:auto;object-fit:contain;}
+.nav-logo-fallback{font-family:var(--font-display);font-size:20px;font-weight:900;background:linear-gradient(135deg,#f97316,#fb923c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-actions{display:flex;align-items:center;gap:10px;}
+.theme-btn{background:transparent;border:1px solid var(--border);color:var(--text-2);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all var(--transition);}
+.theme-btn:hover{border-color:var(--orange);color:var(--orange);}
+.hamburger-btn{background:transparent;border:1px solid var(--border);color:var(--text-2);border-radius:var(--radius-sm);width:36px;height:36px;display:none;align-items:center;justify-content:center;font-size:18px;}
+.sign-in-link{font-size:12px;color:var(--text-2);padding:7px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);transition:all var(--transition);font-weight:500;cursor:pointer;background:none;}
+.sign-in-link:hover{color:var(--orange);border-color:var(--orange);}
+
+/* SIDE MENU */
+.side-menu{position:fixed;top:0;right:-270px;width:270px;height:100vh;background:var(--bg-card);border-left:1px solid var(--border);z-index:200;transition:right 0.3s ease;padding:24px 20px;display:flex;flex-direction:column;gap:6px;}
+.side-menu.open{right:0;}
+.side-menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:199;display:none;}
+.side-menu-overlay.open{display:block;}
+.side-menu-close{align-self:flex-end;background:transparent;border:none;font-size:22px;color:var(--text-2);margin-bottom:16px;padding:4px;}
+.side-menu a,.side-menu button.side-link{display:block;padding:14px 16px;color:var(--text-1);font-size:15px;font-weight:500;border-radius:var(--radius-sm);transition:background var(--transition);text-decoration:none;background:none;border:none;width:100%;text-align:left;cursor:pointer;}
+.side-menu a:hover,.side-menu button.side-link:hover{background:var(--bg-hover);color:var(--orange);}
+
+/* ============================================================
+   HERO / PLAYER
+============================================================ */
+.hero{padding:60px 20px 40px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,var(--orange-glow) 0%,transparent 70%);pointer-events:none;}
+.hero-eyebrow{display:inline-block;font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);border:1px solid var(--orange-dim);background:var(--orange-dim);padding:5px 14px;border-radius:20px;margin-bottom:20px;}
+.hero-title{font-size:clamp(34px,7vw,62px);font-weight:900;line-height:1.08;letter-spacing:-0.02em;color:var(--text-1);margin-bottom:16px;}
+.hero-title .accent{background:linear-gradient(135deg,#f97316,#fb923c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{font-size:16px;color:var(--text-2);max-width:460px;margin:0 auto 40px;line-height:1.6;}
+
+/* BOOKING WIDGET */
+.booking-widget{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;max-width:700px;margin:0 auto;box-shadow:var(--shadow);}
+.booking-widget-title{font-family:var(--font-display);font-size:17px;font-weight:700;margin-bottom:20px;color:var(--text-1);}
+.booking-form-row{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;margin-bottom:16px;align-items:end;}
+.booking-chips{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{padding:8px 16px;border:1px solid var(--border);border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;transition:all var(--transition);background:transparent;color:var(--text-1);}
+.chip:hover{border-color:var(--orange);color:var(--orange);}
+.chip.selected{background:var(--orange);border-color:var(--orange);color:#fff;box-shadow:0 0 12px var(--orange-glow);}
+.avail-result{margin-top:24px;border-radius:var(--radius-md);padding:24px;border:1px solid var(--border);}
+.avail-result.yes{border-color:var(--success);background:var(--success-bg);}
+.avail-result.no{border-color:var(--danger);background:var(--danger-bg);}
+.avail-headline{font-family:var(--font-display);font-size:20px;font-weight:800;margin-bottom:8px;}
+.avail-result.yes .avail-headline{color:var(--success);}
+.avail-result.no  .avail-headline{color:var(--danger);}
+
+/* PACKAGES */
+.packages-section{padding:48px 20px;}
+.section-eyebrow{font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);margin-bottom:8px;}
+.section-title{font-size:26px;font-weight:800;margin-bottom:20px;}
+.package-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;display:flex;flex-direction:column;gap:12px;transition:all var(--transition);cursor:pointer;}
+.package-card:hover,.package-card.selected-pkg{border-color:var(--orange);box-shadow:var(--shadow-glow);}
+.package-card.selected-pkg{background:var(--orange-dim);}
+.package-name{font-family:var(--font-display);font-size:19px;font-weight:700;}
+.package-price{font-size:26px;font-weight:800;color:var(--orange);}
+.package-price span{font-size:13px;font-weight:400;color:var(--text-2);}
+.package-includes{font-size:13px;color:var(--text-2);line-height:1.8;}
+
+/* CONTACT */
+.contact-strip{background:var(--bg-card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:32px 20px;text-align:center;}
+.contact-strip p{font-size:14px;color:var(--text-2);margin-bottom:16px;}
+
+/* ABOUT */
+#about-section{padding:60px 20px;max-width:760px;margin:0 auto;}
+.about-title{font-size:30px;font-weight:800;margin-bottom:16px;}
+.about-body{font-size:15px;color:var(--text-2);line-height:1.8;margin-bottom:14px;}
+.about-team{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;}
+.team-chip{background:var(--orange-dim);border:1px solid var(--orange);color:var(--orange);padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;}
+
+/* FOOTER */
+footer{padding:24px 20px;text-align:center;font-size:12px;color:var(--text-3);border-top:1px solid var(--border);}
+
+/* ============================================================
+   BOOKING FORM VIEW (Player)
+============================================================ */
+#booking-form-view{min-height:100vh;padding:0;}
+.booking-form-nav{background:var(--bg-card);border-bottom:1px solid var(--border);padding:0 20px;}
+.booking-form-nav-inner{max-width:800px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:62px;}
+.booking-form-body{max-width:800px;margin:0 auto;padding:32px 20px 60px;}
+.booking-form-title{font-family:var(--font-display);font-size:26px;font-weight:900;margin-bottom:6px;}
+.booking-form-sub{font-size:14px;color:var(--text-2);margin-bottom:28px;}
+.form-section{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:20px;}
+.form-section-title{font-family:var(--font-display);font-size:16px;font-weight:700;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.form-field{margin-bottom:16px;}
+.form-field:last-child{margin-bottom:0;}
+.cat-booking-row{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px;}
+.cat-booking-row-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.cat-booking-row-label{font-weight:600;font-size:14px;flex:1;}
+.cat-booking-sub{margin-top:8px;}
+.tnc-box{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;display:flex;align-items:flex-start;gap:12px;}
+.tnc-box input[type="checkbox"]{margin-top:3px;flex-shrink:0;}
+.tnc-box label{margin:0;font-size:13px;color:var(--text-2);line-height:1.6;}
+.tnc-link{color:var(--orange);cursor:pointer;text-decoration:underline;}
+
+/* TNC MODAL */
+.tnc-content{font-size:13px;color:var(--text-2);line-height:1.8;max-height:60vh;overflow-y:auto;padding-right:6px;}
+.tnc-content h3{font-size:14px;color:var(--text-1);margin:16px 0 6px;}
+.tnc-content p{margin-bottom:10px;}
+.tnc-content ol{padding-left:18px;margin-bottom:10px;}
+.tnc-content ol li{margin-bottom:6px;}
+
+/* ============================================================
+   ADMIN
+============================================================ */
+#admin-view{min-height:100vh;display:flex;flex-direction:column;}
+.admin-nav{background:var(--bg-card);border-bottom:1px solid var(--border);padding:0 20px;}
+.admin-nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:58px;}
+.admin-logo{font-family:var(--font-display);font-size:16px;font-weight:800;}
+.admin-logo span{color:var(--orange);}
+.admin-tabs-wrap{background:var(--bg-card);border-bottom:1px solid var(--border);}
+.admin-tabs{display:flex;gap:4px;overflow-x:auto;padding:10px 20px;max-width:1200px;margin:0 auto;width:100%;}
+.admin-tab{padding:9px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;background:transparent;color:var(--text-2);border:1px solid transparent;transition:all var(--transition);white-space:nowrap;}
+.admin-tab:hover{color:var(--text-1);background:var(--bg-hover);}
+.admin-tab.active{background:var(--orange);color:#fff;box-shadow:0 0 14px var(--orange-glow);}
+.admin-body{flex:1;padding:24px 20px;max-width:1200px;margin:0 auto;width:100%;}
+.admin-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.admin-section-title{font-family:var(--font-display);font-size:22px;font-weight:800;}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.filter-row input,.filter-row select{max-width:180px;}
+.stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:24px;}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:18px;}
+.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-2);margin-bottom:8px;}
+.stat-value{font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--orange);}
+.admin-panel-wrap{display:none;}
+.admin-panel-wrap.active{display:block;}
+.actions-row{display:flex;gap:6px;flex-wrap:wrap;}
+
+/* Schedule view toggles */
+.schedule-view-tabs{display:flex;gap:8px;margin-bottom:20px;}
+.view-toggle-btn{padding:8px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--text-2);cursor:pointer;transition:all var(--transition);}
+.view-toggle-btn.active{background:var(--orange);color:#fff;border-color:var(--orange);}
+
+/* Count input inline */
+.count-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.count-row label{margin:0;flex:1;font-size:13px;}
+.count-row input[type="number"]{width:70px;flex-shrink:0;padding:7px 10px;}
+.count-row input[type="checkbox"]{flex-shrink:0;}
+
+/* ============================================================
+   LOGIN VIEW
+============================================================ */
+#login-view{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px 32px;width:100%;max-width:380px;box-shadow:var(--shadow);}
+.login-logo{text-align:center;margin-bottom:28px;}
+.login-logo img{height:52px;object-fit:contain;}
+.login-logo-text{font-family:var(--font-display);font-size:26px;font-weight:900;background:linear-gradient(135deg,#f97316,#fb923c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.login-sub{font-size:13px;color:var(--text-2);margin-top:4px;}
+.login-title{font-family:var(--font-display);font-size:20px;font-weight:700;margin-bottom:20px;}
+
+/* ============================================================
+   SPINNER / EMPTY / LOADING
+============================================================ */
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-overlay{display:flex;align-items:center;justify-content:center;gap:10px;padding:32px;color:var(--text-2);font-size:14px;}
+.empty-state{text-align:center;padding:48px 24px;color:var(--text-2);}
+.empty-state .icon{font-size:36px;margin-bottom:12px;}
+.empty-state p{font-size:14px;}
+
+/* ============================================================
+   SUCCESS POPUP
+============================================================ */
+.success-modal-icon{font-size:52px;text-align:center;margin-bottom:16px;}
+.success-modal-title{font-family:var(--font-display);font-size:22px;font-weight:800;text-align:center;color:var(--success);margin-bottom:12px;}
+.success-modal-body{font-size:14px;color:var(--text-2);text-align:center;line-height:1.7;}
+.booking-ref{display:inline-block;background:var(--orange-dim);border:1px solid var(--orange);color:var(--orange);padding:6px 16px;border-radius:20px;font-weight:700;font-size:15px;margin:12px 0;}
+
+/* ============================================================
+   PRODUCT ASSIGNMENT (Confirm Booking)
+============================================================ */
+.assign-section{margin-bottom:18px;}
+.assign-section-label{font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.assign-cat-block{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px;}
+.assign-cat-title{font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:4px;}
+.assign-cat-meta{font-size:11px;color:var(--text-2);margin-bottom:10px;}
+.assign-product-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.assign-product-row:last-child{border-bottom:none;padding-bottom:0;}
+.assign-product-row input[type="checkbox"]{flex-shrink:0;}
+.assign-product-label{flex:1;font-size:13px;color:var(--text-1);}
+.assign-product-status{font-size:11px;padding:2px 8px;border-radius:12px;white-space:nowrap;}
+.assign-avail{background:var(--success-bg);color:var(--success);}
+.assign-busy{background:var(--danger-bg);color:var(--danger);}
+.assign-maint{background:var(--warn-bg);color:var(--warn);}
+.assign-count-badge{font-size:11px;color:var(--warn);font-weight:600;margin-left:4px;}
+.booking-summary-bar{background:var(--orange-dim);border:1px solid var(--orange);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:20px;font-size:13px;display:flex;gap:16px;flex-wrap:wrap;}
+.booking-summary-bar span{color:var(--text-2);}
+.booking-summary-bar strong{color:var(--text-1);}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media(max-width:700px){
+  .booking-form-row{grid-template-columns:1fr;}
+  .grid-2,.grid-3,.form-row{grid-template-columns:1fr;}
+  .hamburger-btn{display:flex;}
+  .sign-in-link.desktop-only{display:none;}
+  .filter-row input,.filter-row select{max-width:100%;flex:1;min-width:120px;}
+  .cal-cell{min-height:48px;}
+  .cal-event{display:none;}
+  .schedule-view-tabs{flex-wrap:wrap;}
+  .admin-section-header{flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDE MENU OVERLAY -->
+<div class="side-menu-overlay" id="sideMenuOverlay" onclick="closeSideMenu()"></div>
+<nav class="side-menu" id="sideMenu" aria-label="Navigation">
+  <button class="side-menu-close" onclick="closeSideMenu()" aria-label="Close menu">✕</button>
+  <a href="#about-section" onclick="closeSideMenu()">About Us</a>
+  <a href="#contact-section" onclick="closeSideMenu()">Contact</a>
+  <button class="side-link" onclick="closeSideMenu();showAdminLogin()">Sign in as Admin</button>
+</nav>
+
+<!-- TOAST -->
+<div id="toast" role="alert" aria-live="polite"></div>
+
+<!-- ================================================================
+     LOGIN VIEW
+================================================================ -->
+<div id="login-view" class="hidden">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="https://drive.google.com/uc?export=view&id=1Sc69IFmSfLzX09JpdVlqITqcX2YT5NTR"
+           alt="EPIC Rentals"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block';" />
+      <div class="login-logo-text" style="display:none;">EPIC Rentals</div>
+      <div class="login-sub">Admin Portal</div>
+    </div>
+    <h1 class="login-title">Sign in</h1>
+    <div class="mb-4">
+      <label for="login-email">Email</label>
+      <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email" />
+    </div>
+    <div class="mb-4">
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+    <button class="btn btn-primary w-full" id="login-btn" onclick="doLogin()">Sign in</button>
+    <p class="mt-4 text-center text-sm text-muted">
+      <a href="#" onclick="showPlayerView();return false;">← Back to EPIC Rentals</a>
+    </p>
+  </div>
+</div>
+
+<!-- ================================================================
+     BOOKING FORM VIEW (Player)
+================================================================ -->
+<div id="booking-form-view" class="hidden">
+  <nav class="booking-form-nav">
+    <div class="booking-form-nav-inner">
+      <a href="#" onclick="showPlayerView();return false;" class="nav-logo" style="-webkit-text-fill-color:inherit;">
+        <img src="https://drive.google.com/uc?export=view&id=1Sc69IFmSfLzX09JpdVlqITqcX2YT5NTR"
+             alt="EPIC Rentals" style="height:38px;"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='block';" />
+        <span class="nav-logo-fallback" style="display:none;">EPIC Rentals</span>
+      </a>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme"><span id="theme-icon-bf">☀️</span></button>
+        <button class="btn btn-ghost btn-sm" onclick="showPlayerView()">← Back</button>
+      </div>
+    </div>
+  </nav>
+  <div class="booking-form-body">
+    <div class="booking-form-title">🎮 Booking Enquiry</div>
+    <div class="booking-form-sub">Fill in your details and we'll get back to you shortly to confirm.</div>
+
+    <!-- Personal Details -->
+    <div class="form-section">
+      <div class="form-section-title">👤 Your Details</div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="bf-fullname">Full Name *</label>
+          <input type="text" id="bf-fullname" placeholder="As on your ID" />
+        </div>
+        <div class="form-field">
+          <label for="bf-mobile">Mobile Number *</label>
+          <input type="tel" id="bf-mobile" placeholder="10-digit number" maxlength="10" />
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="bf-social">Social Media Profile Link (Facebook / Instagram / LinkedIn) *</label>
+        <input type="url" id="bf-social" placeholder="https://instagram.com/yourprofile" />
+      </div>
+    </div>
+
+    <!-- Rental Details -->
+    <div class="form-section">
+      <div class="form-section-title">📅 Rental Details</div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="bf-start">Start Date *</label>
+          <input type="text" id="bf-start" placeholder="DD/MM/YYYY" readonly />
+        </div>
+        <div class="form-field">
+          <label for="bf-end">End Date *</label>
+          <input type="text" id="bf-end" placeholder="DD/MM/YYYY" readonly />
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label>Product Categories & Requirements *</label>
+        <div id="bf-categories-list"><!-- populated dynamically --></div>
+      </div>
+
+      <div class="form-field">
+        <label for="bf-package">Package *</label>
+        <select id="bf-package">
+          <option value="">Select a package…</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Delivery -->
+    <div class="form-section">
+      <div class="form-section-title">🚚 Delivery Address</div>
+      <div class="form-field">
+        <label for="bf-address">Full Address *</label>
+        <textarea id="bf-address" rows="2" placeholder="House/Flat No., Street, Area…"></textarea>
+      </div>
+      <div class="form-field">
+        <label for="bf-landmark">Landmark</label>
+        <input type="text" id="bf-landmark" placeholder="Nearest landmark for easy delivery" />
+      </div>
+    </div>
+
+    <!-- T&C -->
+    <div class="form-section">
+      <div class="form-section-title">📜 Terms & Conditions</div>
+      <div class="tnc-box">
+        <input type="checkbox" id="bf-tnc" />
+        <label for="bf-tnc">
+          I have read and agree to the <span class="tnc-link" onclick="openTncModal()">Terms & Conditions</span> and Damage & Repair Policy of EPIC Rentals. I understand that this is a booking enquiry and confirmation is subject to payment and verification.
+        </label>
+      </div>
+    </div>
+
+    <button class="btn btn-primary w-full" style="padding:15px;font-size:16px;" onclick="submitBookingEnquiry()">
+      Submit Booking Enquiry →
+    </button>
+  </div>
+</div>
+
+<!-- ================================================================
+     PLAYER VIEW
+================================================================ -->
+<div id="player-view">
+  <!-- NAV -->
+  <nav class="nav" role="navigation" aria-label="Main">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" onclick="return false;">
+        <img src="https://drive.google.com/uc?export=view&id=1Sc69IFmSfLzX09JpdVlqITqcX2YT5NTR"
+             alt="EPIC Rentals"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='block';" />
+        <span class="nav-logo-fallback" style="display:none;">EPIC Rentals</span>
+      </a>
+      <div class="nav-actions">
+        <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme"><span id="theme-icon">☀️</span></button>
+        <button class="sign-in-link desktop-only" onclick="showAdminLogin()">Sign in as Admin</button>
+        <button class="hamburger-btn" onclick="openSideMenu()" aria-label="Open menu">☰</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">📍 Delivering in Chennai</div>
+    <h1 class="hero-title">Rent. Play.<br /><span class="accent">Level Up.</span></h1>
+    <p class="hero-sub">PS5 consoles, controllers & games — delivered to your door. No ownership. Just pure gaming.</p>
+
+    <div class="booking-widget">
+      <div class="booking-widget-title">🎮 What are you looking for?</div>
+      <div class="mb-4">
+        <label>Choose category</label>
+        <div class="booking-chips" id="categoryChips" role="group" aria-label="Product categories">
+          <div class="loading-overlay"><div class="spinner"></div> Loading…</div>
+        </div>
+      </div>
+      <div class="booking-form-row">
+        <div>
+          <label for="start-date">Start date</label>
+          <input type="text" id="start-date" placeholder="DD/MM/YYYY" readonly />
+        </div>
+        <div>
+          <label for="end-date">End date</label>
+          <input type="text" id="end-date" placeholder="DD/MM/YYYY" readonly />
+        </div>
+        <button class="btn btn-primary" onclick="checkAvailability()" id="check-btn" style="height:42px;">Check</button>
+      </div>
+      <div id="avail-result" class="hidden"></div>
+    </div>
+  </section>
+
+  <!-- PACKAGES — shown only after availability check -->
+  <section class="packages-section hidden" id="packages-section">
+    <div class="container">
+      <div class="section-eyebrow">💰 Rental Packages</div>
+      <h2 class="section-title">Choose from our exclusive packages</h2>
+      <div class="grid-3" id="packages-grid">
+        <div class="loading-overlay"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact-strip" id="contact-section">
+    <div class="container">
+      <p>Have questions? Want something custom? We're just a message away. 📲</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="https://wa.me/919444659236" target="_blank" rel="noopener" class="btn btn-ghost">💬 WhatsApp</a>
+        <a href="https://www.instagram.com/epic_rentals_chennai/" target="_blank" rel="noopener" class="btn btn-ghost">📸 Instagram</a>
+        <a href="mailto:epicrentalschennai@gmail.com" class="btn btn-ghost">✉️ Email</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about-section">
+    <div class="section-eyebrow" style="padding:0 20px;max-width:760px;margin:0 auto;">🕹️ Our Story</div>
+    <div style="max-width:760px;margin:0 auto;padding:0 20px 60px;">
+      <h2 class="about-title">About EPIC Rentals</h2>
+      <p class="about-body">We're five friends from Chennai who couldn't justify owning a PS5 at full price — so we built the next best thing. EPIC Rentals lets you experience the full PS5 gaming thrill at home, for a fraction of the cost, with zero commitment.</p>
+      <p class="about-body">Started small with 2 consoles and a mission: make premium gaming accessible to everyone in Chennai. We deliver, you play, we pick it back up. Simple as that.</p>
+      <p class="about-body">Big plans ahead — more consoles, more cities, more games. Stay tuned.</p>
+      <div class="about-team">
+        <span class="team-chip">🎮 Founded by 5 Co-founders</span>
+        <span class="team-chip">📍 Chennai, India</span>
+        <span class="team-chip">🚀 Est. 2024</span>
+      </div>
+    </div>
+  </section>
+
+  <footer><p>© 2024 EPIC Rentals. Made with ❤️ in Chennai.</p></footer>
+</div>
+
+<!-- ================================================================
+     ADMIN VIEW
+================================================================ -->
+<div id="admin-view" class="hidden">
+  <nav class="admin-nav">
+    <div class="admin-nav-inner">
+      <div class="admin-logo">EPIC <span>Admin</span></div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme"><span id="theme-icon-admin">☀️</span></button>
+        <span id="admin-email-label" class="text-sm text-muted"></span>
+        <button class="btn btn-ghost btn-sm" onclick="doLogout()">Sign out</button>
+      </div>
+    </div>
+  </nav>
+  <div class="admin-tabs-wrap">
+    <div class="admin-tabs" role="tablist">
+      <button class="admin-tab active" onclick="switchAdminTab('bookings',this)">📋 EPIC Bookings</button>
+      <button class="admin-tab" onclick="switchAdminTab('inventory',this)">📦 EPIC Inventory</button>
+      <button class="admin-tab" onclick="switchAdminTab('schedule',this)">📅 EPIC Schedule</button>
+      <button class="admin-tab" onclick="switchAdminTab('packages',this)">💰 EPIC Packages</button>
+    </div>
+  </div>
+  <div class="admin-body">
+
+    <!-- BOOKINGS -->
+    <div id="tab-bookings" class="admin-panel-wrap active">
+      <div class="admin-section-header">
+        <h2 class="admin-section-title">📋 EPIC Bookings</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="exportBookingsXLS()">📥 Export XLS</button>
+          <button class="btn btn-primary btn-sm" onclick="openAdminBookingModal()">+ Add Booking</button>
+        </div>
+      </div>
+      <div class="stat-cards" id="booking-stats"></div>
+      <div class="filter-row">
+        <input type="text" id="bf-name-f" placeholder="Filter by name…" oninput="renderBookingsTable()" />
+        <select id="bf-status-f" onchange="renderBookingsTable()">
+          <option value="">All statuses</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="rejected">Rejected</option>
+        </select>
+        <select id="bf-cat-f" onchange="renderBookingsTable()">
+          <option value="">All categories</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table aria-label="Bookings">
+          <thead>
+            <tr>
+              <th>Booking ID</th><th>Date</th><th>Category</th><th>Player</th>
+              <th>Mobile</th><th>Address</th><th>Start</th><th>End</th>
+              <th>Package</th><th>Status</th><th>Pkg Finalised</th><th>Price (₹)</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="bookings-tbody">
+            <tr><td colspan="13"><div class="loading-overlay"><div class="spinner"></div> Loading…</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INVENTORY -->
+    <div id="tab-inventory" class="admin-panel-wrap">
+      <div class="admin-section-header">
+        <h2 class="admin-section-title">📦 EPIC Inventory</h2>
+        <button class="btn btn-primary" onclick="openInventoryModal()">+ Add Item</button>
+      </div>
+      <div class="filter-row">
+        <input type="text" id="if-name" placeholder="Filter by name…" oninput="renderInventoryTable()" />
+        <select id="if-cat" onchange="renderInventoryTable()"><option value="">All categories</option></select>
+        <select id="if-status" onchange="renderInventoryTable()">
+          <option value="">All statuses</option>
+          <option value="available">Available</option>
+          <option value="rented">Rented</option>
+          <option value="maintenance">Maintenance</option>
+        </select>
+        <input type="text" id="if-tag" placeholder="Filter by tag…" oninput="renderInventoryTable()" />
+      </div>
+      <div class="table-wrap">
+        <table aria-label="Inventory">
+          <thead>
+            <tr><th>Name</th><th>Category</th><th>Description</th><th>Tag</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="inventory-tbody">
+            <tr><td colspan="6"><div class="loading-overlay"><div class="spinner"></div> Loading…</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SCHEDULE -->
+    <div id="tab-schedule" class="admin-panel-wrap">
+      <div class="admin-section-header">
+        <h2 class="admin-section-title">📅 EPIC Schedule</h2>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm" onclick="changeMonth(-1)">‹ Prev</button>
+          <span id="cal-month-label" style="font-family:var(--font-display);font-weight:700;padding:8px 12px;font-size:15px;"></span>
+          <button class="btn btn-ghost btn-sm" onclick="changeMonth(1)">Next ›</button>
+        </div>
+      </div>
+      <div class="schedule-view-tabs">
+        <button class="view-toggle-btn active" id="sched-pending-btn" onclick="switchScheduleView('pending',this)">⏳ Pending Enquiries</button>
+        <button class="view-toggle-btn" id="sched-confirmed-btn" onclick="switchScheduleView('confirmed',this)">✅ Confirmed Bookings</button>
+      </div>
+      <div class="filter-row" style="margin-bottom:12px;">
+        <select id="sched-cat-f" onchange="renderCalendar()"><option value="">All categories</option></select>
+        <select id="sched-prod-f" onchange="renderCalendar()"><option value="">All products</option></select>
+      </div>
+      <div class="cal-grid" id="cal-grid" role="grid" aria-label="Schedule"></div>
+      <div class="cal-legend" id="cal-legend"></div>
+    </div>
+
+    <!-- PACKAGES -->
+    <div id="tab-packages" class="admin-panel-wrap">
+      <div class="admin-section-header">
+        <h2 class="admin-section-title">💰 EPIC Packages</h2>
+        <button class="btn btn-primary" onclick="openPackageModal()">+ Add Package</button>
+      </div>
+      <div class="grid-3" id="packages-admin-grid">
+        <div class="loading-overlay"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================================================================
+     MODALS
+================================================================ -->
+
+<!-- T&C Modal -->
+<div class="modal-overlay hidden" id="tnc-modal">
+  <div class="modal modal-lg">
+    <h2 class="modal-title">📜 Terms & Conditions</h2>
+    <div class="tnc-content">
+      <p>By confirming a booking this will be a rental Agreement entered with <strong>Latha.S</strong> herein after referred to as owner (of the rental equipment) residing in Virugambakkam Chennai, the customer acknowledges and agrees to the following Terms & Conditions:</p>
+      <h3>Booking Policy</h3>
+      <p>Renters must be 18 years of age or older. Age will be verified at the time of booking.</p>
+      <h3>Payment Policy</h3>
+      <ol>
+        <li>A 50% advance payment of the total rental amount is required at the time of booking confirmation.</li>
+        <li>The remaining 50% balance must be paid upon delivery of the gaming console.</li>
+      </ol>
+      <h3>Verification & Security</h3>
+      <p>At the time of delivery, representative will collect a photocopy of a valid, government-issued address proof for security and verification purposes. The individual providing the ID must be the same person who collects and returns the console.</p>
+      <h3>Damages & Repairs</h3>
+      <ol>
+        <li>Any damages, loss, or technical issues arising during the rental period will be assessed as per Damage & Repair Policy.</li>
+        <li>Repair or replacement costs, if applicable, shall be borne by the customer.</li>
+      </ol>
+      <h3>Booking Amendments & Cancellation Policy</h3>
+      <ol>
+        <li>Customers may request modifications to their booking (package or duration), subject to availability and approval.</li>
+        <li>In case of cancellation, all advance payments are non-refundable, including the 50% booking confirmation amount.</li>
+        <li>Owner reserves the right to retain the advance payment as compensation for reservation, preparation, and administrative costs.</li>
+        <li>Owner reserves the right to amend or update these Terms & Conditions at any time without prior notice.</li>
+        <li>Use of Equipment: The rented equipment includes PlayStation 5 Console, Controllers, Games (if applicable), Accessories (Charging Cable, HDMI cable, etc.). The equipment must be used only for personal purposes. Sub-renting, resale, or commercial use is strictly prohibited. The renter shall not modify, open, or repair the equipment.</li>
+      </ol>
+      <h3>Damage & Repair Policy</h3>
+      <p>Owner will ensure that all rental equipment is maintained and provided in good working condition. However, in the event of any loss or damage to the rented equipment during the rental period, the following terms and conditions shall apply:</p>
+      <ol>
+        <li><strong>Damage Responsibility:</strong> The renter shall be fully responsible for any loss of or damage to the rented equipment, including but not limited to the PS5 console, controllers, disc games, and accessories, occurring during the rental period. This responsibility includes, without limitation, physical damage, liquid damage, electrical damage, misuse, or negligence.</li>
+        <li><strong>Inspection and Assessment:</strong> Upon return of the rented equipment, Owner reserves the right to conduct a thorough inspection to determine the condition of the equipment.</li>
+        <li><strong>Repair and Replacement Charges:</strong> Where damage or loss is identified, the renter agrees to bear all costs associated with the repair or replacement of the equipment.</li>
+        <li><strong>Notification of Charges:</strong> The renter shall be promptly informed of any additional charges arising from damage or loss. A detailed breakdown of charges shall be provided upon request.</li>
+        <li><strong>Prevention and Care:</strong> The renter agrees to take all reasonable precautions to prevent damage to the rented equipment, including handling with care, avoiding exposure to liquids, and ensuring proper ventilation during use.</li>
+        <li><strong>Dispute Resolution:</strong> In the event of any dispute relating to damage or additional charges, Owner reserves the right to make the final determination based on inspection findings, rental agreement terms, and supporting evidence.</li>
+      </ol>
+      <p>The PS5 carry case may include a location tracking device (such as an AirTag) solely to safeguard the equipment, and by confirming the booking, the customer acknowledges and consents to this measure, which is used only to track the equipment and not the customer.</p>
+      <h3>Customer Acknowledgment</h3>
+      <p>By booking a rental package, the renter acknowledges that they have read, understood, and agreed to be bound by the terms and conditions outlined herein. The renter further acknowledges that failure to comply with these terms may result in additional fees, charges, or cancellation of the booking.</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="closeModal('tnc-modal');document.getElementById('bf-tnc').checked=true;">I Agree</button>
+      <button class="btn btn-ghost" onclick="closeModal('tnc-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Booking Success Modal -->
+<div class="modal-overlay hidden" id="booking-success-modal">
+  <div class="modal" style="text-align:center;">
+    <div class="success-modal-icon">🎮</div>
+    <div class="success-modal-title">Booking Enquiry Submitted!</div>
+    <div class="success-modal-body">
+      <p>Thank you for submitting a booking enquiry.<br/>Our executive will be in touch shortly.</p>
+      <div class="booking-ref" id="success-booking-ref"></div>
+      <p class="text-sm text-muted mt-4">Please keep this reference number handy.</p>
+    </div>
+    <div class="modal-actions" style="justify-content:center;margin-top:24px;">
+      <button class="btn btn-primary" onclick="closeModal('booking-success-modal');showPlayerView();">Back to Home</button>
+    </div>
+  </div>
+</div>
+
+<!-- Inventory Modal -->
+<div class="modal-overlay hidden" id="inventory-modal">
+  <div class="modal">
+    <h2 class="modal-title" id="inv-modal-title">Add Inventory Item</h2>
+    <input type="hidden" id="inv-id" />
+    <div class="mb-4">
+      <label for="inv-category">Product Category *</label>
+      <select id="inv-category"></select>
+    </div>
+    <div class="mb-4">
+      <label for="inv-name">Product Name *</label>
+      <input type="text" id="inv-name" placeholder="e.g., PS5 Console #1" />
+    </div>
+    <div class="mb-4">
+      <label for="inv-desc">Description</label>
+      <textarea id="inv-desc" rows="2" placeholder="Brief description…"></textarea>
+    </div>
+    <div class="grid-2">
+      <div>
+        <label for="inv-tag">Tag</label>
+        <input type="text" id="inv-tag" placeholder="e.g., featured" />
+      </div>
+      <div>
+        <label for="inv-status">Status *</label>
+        <select id="inv-status">
+          <option value="available">Available</option>
+          <option value="rented">Rented</option>
+          <option value="maintenance">Maintenance</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('inventory-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveInventoryItem()">Save Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- Package Modal -->
+<div class="modal-overlay hidden" id="package-modal">
+  <div class="modal modal-lg">
+    <h2 class="modal-title" id="pkg-modal-title">Add Package</h2>
+    <input type="hidden" id="pkg-id" />
+    <div class="mb-4">
+      <label for="pkg-name">Package Name *</label>
+      <input type="text" id="pkg-name" placeholder="e.g., Weekend Special" />
+    </div>
+    <div class="mb-4">
+      <label>Categories & Count *</label>
+      <div id="pkg-cat-counts"><!-- populated --></div>
+    </div>
+    <div class="mb-4">
+      <label for="pkg-games">Games Included (optional, comma-separated)</label>
+      <input type="text" id="pkg-games" placeholder="e.g., FIFA 24, Spider-Man 2" />
+    </div>
+    <div class="grid-2">
+      <div class="mb-4">
+        <label for="pkg-price-day">Price per Day (₹, optional)</label>
+        <input type="number" id="pkg-price-day" placeholder="0" min="0" />
+      </div>
+      <div class="mb-4">
+        <label for="pkg-total">Total Price (₹) *</label>
+        <input type="number" id="pkg-total" placeholder="0" min="0" />
+      </div>
+    </div>
+    <div class="mb-4">
+      <label for="pkg-duration">Duration label (optional)</label>
+      <input type="text" id="pkg-duration" placeholder="e.g., 7 days" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('package-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="savePackage()">Save Package</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Booking Modal (Add / Edit) -->
+<div class="modal-overlay hidden" id="admin-booking-modal">
+  <div class="modal modal-lg">
+    <h2 class="modal-title" id="admin-book-modal-title">Add Booking</h2>
+    <input type="hidden" id="ab-id" />
+    <div class="modal-section-label">Player Details</div>
+    <div class="form-row mb-4">
+      <div>
+        <label for="ab-name">Full Name *</label>
+        <input type="text" id="ab-name" placeholder="Player name" />
+      </div>
+      <div>
+        <label for="ab-mobile">Mobile</label>
+        <input type="text" id="ab-mobile" placeholder="10-digit" />
+      </div>
+    </div>
+    <div class="mb-4">
+      <label for="ab-social">Social Media Link</label>
+      <input type="text" id="ab-social" placeholder="Instagram / Facebook / LinkedIn" />
+    </div>
+    <div class="mb-4">
+      <label for="ab-address">Delivery Address</label>
+      <textarea id="ab-address" rows="2"></textarea>
+    </div>
+    <div class="mb-4">
+      <label for="ab-landmark">Landmark</label>
+      <input type="text" id="ab-landmark" />
+    </div>
+    <div class="modal-section-label">Booking Details</div>
+    <div class="form-row mb-4">
+      <div>
+        <label for="ab-start">Start Date</label>
+        <input type="text" id="ab-start" placeholder="YYYY-MM-DD" />
+      </div>
+      <div>
+        <label for="ab-end">End Date</label>
+        <input type="text" id="ab-end" placeholder="YYYY-MM-DD" />
+      </div>
+    </div>
+    <div class="mb-4">
+      <label for="ab-cat">Product Category</label>
+      <select id="ab-cat"></select>
+    </div>
+    <div class="mb-4">
+      <label for="ab-package-sel">Package Chosen</label>
+      <input type="text" id="ab-package-sel" placeholder="Package name or custom" />
+    </div>
+    <div class="modal-section-label">Admin Fields</div>
+    <div class="form-row mb-4">
+      <div>
+        <label for="ab-pkg-final">Package Finalised</label>
+        <input type="text" id="ab-pkg-final" placeholder="Final package name" />
+      </div>
+      <div>
+        <label for="ab-price-final">Price incl. Delivery (₹)</label>
+        <input type="number" id="ab-price-final" placeholder="0" min="0" />
+      </div>
+    </div>
+    <div class="mb-4">
+      <label for="ab-status">Status</label>
+      <select id="ab-status">
+        <option value="pending">Pending</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="rejected">Rejected</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('admin-booking-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAdminBooking()">Save Booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm & Assign Products Modal -->
+<div class="modal-overlay hidden" id="assign-modal">
+  <div class="modal modal-lg">
+    <h2 class="modal-title">✅ Confirm Booking & Assign Products</h2>
+    <input type="hidden" id="assign-booking-id" />
+
+    <!-- Summary bar -->
+    <div class="booking-summary-bar" id="assign-summary-bar"></div>
+
+    <!-- Per-category product assignment -->
+    <div class="assign-section">
+      <div class="assign-section-label">Assign specific products from inventory</div>
+      <div id="assign-categories-body"><!-- populated dynamically --></div>
+    </div>
+
+    <!-- Admin fields -->
+    <div class="assign-section">
+      <div class="assign-section-label">Finalise pricing</div>
+      <div class="grid-2">
+        <div class="mb-4">
+          <label for="assign-pkg-final">Package Finalised</label>
+          <input type="text" id="assign-pkg-final" placeholder="e.g. Weekly Package" />
+        </div>
+        <div class="mb-4">
+          <label for="assign-price-final">Price incl. Delivery (₹) *</label>
+          <input type="number" id="assign-price-final" placeholder="0" min="0" />
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('assign-modal')">Cancel</button>
+      <button class="btn btn-success" onclick="saveAssignAndConfirm()">✅ Confirm Booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     FIREBASE + APP SCRIPT
+================================================================ -->
+<script type="module">
+import { initializeApp }          from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import {
+  getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc,
+  doc, query, orderBy, serverTimestamp
+} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import {
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+
+// ---- Firebase ----
+const firebaseConfig = {
+  apiKey: "AIzaSyBRTp9ofAnRjxB1dn09t_3uOSlzU_XkNpo",
+  authDomain: "epicrentals-mvp.firebaseapp.com",
+  projectId: "epicrentals-mvp",
+  storageBucket: "epicrentals-mvp.firebasestorage.app",
+  messagingSenderId: "892655855025",
+  appId: "1:892655855025:web:a5b9dd21d7bb7d2d558990",
+  measurementId: "G-J8GJLHVSYT"
+};
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const auth = getAuth(app);
+
+// ---- Cache ----
+let categories = [], inventory = [], bookings = [], packages = [];
+let currentUser = null;
+let calYear, calMonth;
+let scheduleView = 'pending'; // 'pending' | 'confirmed'
+
+// ---- Colour palette for products in schedule ----
+const PRODUCT_COLOURS = [
+  '#f97316','#3b82f6','#22c55e','#a855f7','#ec4899',
+  '#14b8a6','#eab308','#ef4444','#06b6d4','#84cc16'
+];
+let productColourMap = {};
+
+const G = window;
+
+// ============================================================
+// SEED
+// ============================================================
+async function seedIfEmpty() {
+  const catSnap = await getDocs(collection(db, 'categories'));
+  if (catSnap.empty) {
+    const cats = [
+      { name: 'PS5 Console', order: 1 },
+      { name: 'Controllers', order: 2 },
+      { name: 'Games',       order: 3 },
+    ];
+    const catRefs = [];
+    for (const c of cats) {
+      const r = await addDoc(collection(db, 'categories'), c);
+      catRefs.push({ id: r.id, ...c });
+    }
+    const invItems = [
+      { categoryId:catRefs[0].id, categoryName:'PS5 Console', name:'PS5 Console #1',          description:'Sony PlayStation 5 Disc Edition. Comes with 1 DualSense controller.', tag:'flagship', status:'available' },
+      { categoryId:catRefs[1].id, categoryName:'Controllers',  name:'DualSense Controller #1', description:'PS5 DualSense wireless controller — White.', tag:'', status:'available' },
+      { categoryId:catRefs[1].id, categoryName:'Controllers',  name:'DualSense Controller #2', description:'PS5 DualSense wireless controller — Midnight Black.', tag:'', status:'available' },
+      { categoryId:catRefs[2].id, categoryName:'Games',        name:'PS Play Subscription',    description:'PlayStation Plus subscription — access to a library of games.', tag:'popular', status:'available' },
+    ];
+    for (const item of invItems) {
+      await addDoc(collection(db, 'inventory'), { ...item, createdAt: serverTimestamp() });
+    }
+    await addDoc(collection(db, 'packages'), {
+      name: 'Weekly Package',
+      categoryItems: [
+        { categoryName:'PS5 Console', count: 1 },
+        { categoryName:'Controllers', count: 2 },
+        { categoryName:'Games',       count: 4 },
+      ],
+      gamesIncluded: '',
+      pricePerDay: null,
+      totalPrice: 2700,
+      duration: '7 days',
+      createdAt: serverTimestamp()
+    });
+    showToast('Sample data loaded! Welcome to EPIC Rentals 🎮', 'success');
+  }
+}
+
+// ============================================================
+// LOADERS
+// ============================================================
+async function loadCategories() {
+  const snap = await getDocs(query(collection(db, 'categories'), orderBy('order')));
+  categories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+async function loadInventory() {
+  const snap = await getDocs(collection(db, 'inventory'));
+  inventory = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  // Assign stable colours to products
+  inventory.forEach((item, i) => {
+    if (!productColourMap[item.id]) {
+      productColourMap[item.id] = PRODUCT_COLOURS[i % PRODUCT_COLOURS.length];
+    }
+  });
+}
+async function loadBookings() {
+  const snap = await getDocs(collection(db, 'bookings'));
+  bookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+async function loadPackages() {
+  const snap = await getDocs(collection(db, 'packages'));
+  packages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+// ============================================================
+// PLAYER VIEW
+// ============================================================
+async function initPlayerView() {
+  await Promise.all([loadCategories(), loadInventory(), loadPackages(), loadBookings()]);
+  renderCategoryChips();
+}
+
+function renderCategoryChips() {
+  const el = document.getElementById('categoryChips');
+  if (!categories.length) { el.innerHTML = '<p class="text-muted text-sm">No categories found.</p>'; return; }
+  el.innerHTML = '';
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.textContent = cat.name;
+    btn.dataset.id   = cat.id;
+    btn.dataset.name = cat.name;
+    btn.setAttribute('role', 'radio');
+    btn.setAttribute('aria-checked', 'false');
+    btn.onclick = () => {
+      document.querySelectorAll('#categoryChips .chip').forEach(c => {
+        c.classList.remove('selected');
+        c.setAttribute('aria-checked', 'false');
+      });
+      btn.classList.add('selected');
+      btn.setAttribute('aria-checked', 'true');
+      document.getElementById('avail-result').classList.add('hidden');
+      document.getElementById('packages-section').classList.add('hidden');
+    };
+    el.appendChild(btn);
+  });
+}
+
+G.checkAvailability = async function() {
+  const chip     = document.querySelector('#categoryChips .chip.selected');
+  const startVal = document.getElementById('start-date').value;
+  const endVal   = document.getElementById('end-date').value;
+  if (!chip)     { showToast('Please select a category first.', 'error'); return; }
+  if (!startVal) { showToast('Please pick a start date.', 'error'); return; }
+  if (!endVal)   { showToast('Please pick an end date.', 'error'); return; }
+
+  const btn = document.getElementById('check-btn');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div>';
+
+  const selCatId   = chip.dataset.id;
+  const selCatName = chip.dataset.name;
+  const startDate  = parseDate(startVal);
+  const endDate    = parseDate(endVal);
+
+  const items = inventory.filter(i => i.categoryId === selCatId);
+
+  await loadBookings();
+  const availItems = items.filter(item => {
+    if (item.status === 'maintenance') return false;
+    // FIX 4: Check against assignedProducts array on confirmed bookings
+    // (pending enquiries do NOT block availability — only confirmed ones do)
+    const conflict = bookings.some(b => {
+      if (b.status !== 'confirmed') return false;
+      const assigned = b.assignedProducts || [];
+      if (!assigned.some(ap => ap.productId === item.id)) return false;
+      return datesOverlap(parseDate(b.startDate), parseDate(b.endDate), startDate, endDate);
+    });
+    return !conflict;
+  });
+
+  // Show packages relevant to selected category
+  renderPackagesForCategory(selCatName);
+  document.getElementById('packages-section').classList.remove('hidden');
+
+  if (availItems.length > 0) {
+    showAvailResult('yes', selCatName, startDate, endDate, availItems, selCatId);
+  } else {
+    const next = findNextAvailable(items);
+    showAvailResult('no', selCatName, startDate, endDate, [], next);
+  }
+  btn.disabled = false; btn.textContent = 'Check';
+};
+
+function showAvailResult(type, catName, startDate, endDate, items, nextOrCatId) {
+  const el = document.getElementById('avail-result');
+  el.classList.remove('hidden','yes','no');
+  el.classList.add(type);
+  const startStr = fmtDate(startDate);
+  const endStr   = fmtDate(endDate);
+
+  if (type === 'yes') {
+    const catId = nextOrCatId;
+    el.innerHTML = `
+      <div class="avail-headline">Cheers. You are in for the game! 🎉</div>
+      <p style="font-size:14px;color:var(--success);margin-bottom:16px;">
+        <strong>${items.length} ${catName}</strong> available — ${startStr} to ${endStr}
+      </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="goToBookingForm('${esc(catId)}','${esc(catName)}')">🎮 Book Now →</button>
+        <a href="#contact-section" class="btn btn-ghost">💬 Talk to Us</a>
+      </div>`;
+  } else {
+    const nextAvail = nextOrCatId;
+    el.innerHTML = `
+      <div class="avail-headline">Uh oh! Look at our suggested alternatives 🎮</div>
+      <p style="font-size:14px;color:var(--text-2);margin-bottom:16px;">
+        No <strong>${esc(catName)}</strong> available for selected dates.
+        ${nextAvail ? `✨ Next available: <strong style="color:var(--warn)">${fmtDate(nextAvail)}</strong>` : ''}
+      </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="#packages-section" class="btn btn-ghost">📦 See Other Packages</a>
+        <a href="#contact-section" class="btn btn-ghost">💬 Talk to Us</a>
+      </div>`;
+  }
+  el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function renderPackagesForCategory(catName) {
+  const grid = document.getElementById('packages-grid');
+  const relevant = packages.filter(pkg =>
+    pkg.categoryItems && pkg.categoryItems.some(ci => ci.categoryName === catName)
+  );
+  if (!relevant.length) {
+    grid.innerHTML = '<p class="text-muted text-sm" style="grid-column:1/-1;">No packages available for this category yet.</p>';
+    return;
+  }
+  grid.innerHTML = relevant.map(pkg => `
+    <div class="package-card" id="pkg-player-${pkg.id}" onclick="selectPlayerPackage('${pkg.id}')">
+      <div class="package-name">📦 ${esc(pkg.name)}</div>
+      ${pkg.duration ? `<div class="text-sm text-muted">${esc(pkg.duration)}</div>` : ''}
+      <div class="package-price">₹${(pkg.totalPrice||0).toLocaleString('en-IN')} ${pkg.pricePerDay?`<span>or ₹${pkg.pricePerDay}/day</span>`:''}</div>
+      <div class="package-includes">
+        ${(pkg.categoryItems||[]).map(ci=>`✅ ${esc(ci.categoryName)} × ${ci.count}`).join('<br>')}
+        ${pkg.gamesIncluded ? '<br>🎮 ' + esc(pkg.gamesIncluded) : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+let selectedPlayerPackageId = '';
+G.selectPlayerPackage = function(id) {
+  selectedPlayerPackageId = id;
+  document.querySelectorAll('#packages-grid .package-card').forEach(c => c.classList.remove('selected-pkg'));
+  const card = document.getElementById('pkg-player-' + id);
+  if (card) card.classList.add('selected-pkg');
+};
+
+function findNextAvailable(items) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  for (let i = 0; i < 90; i++) {
+    const d = new Date(today); d.setDate(d.getDate() + i);
+    const ok = items.some(item => {
+      if (item.status === 'maintenance') return false;
+      // FIX: use assignedProducts on confirmed bookings only
+      const conflict = bookings.some(b => {
+        if (b.status !== 'confirmed') return false;
+        const assigned = b.assignedProducts || [];
+        if (!assigned.some(ap => ap.productId === item.id)) return false;
+        return parseDate(b.startDate) <= d && parseDate(b.endDate) >= d;
+      });
+      return !conflict;
+    });
+    if (ok) return d;
+  }
+  return null;
+}
+
+// ---- Booking Form ----
+G.goToBookingForm = function(catId, catName) {
+  // Pre-fill dates
+  const start = document.getElementById('start-date').value;
+  const end   = document.getElementById('end-date').value;
+  document.getElementById('bf-start').value = start;
+  document.getElementById('bf-end').value   = end;
+
+  // Build categories list with sub-fields
+  const catList = document.getElementById('bf-categories-list');
+  catList.innerHTML = categories.map(cat => {
+    const isSelected = cat.id === catId;
+    const isConsoleOrController = cat.name === 'PS5 Console' || cat.name === 'Controllers';
+    const isGames = cat.name === 'Games';
+    return `
+      <div class="cat-booking-row" id="cbr-${cat.id}">
+        <div class="cat-booking-row-header">
+          <input type="checkbox" id="cat-chk-${cat.id}" ${isSelected?'checked':''} onchange="toggleCatBookingRow('${cat.id}')" style="width:auto;" />
+          <label for="cat-chk-${cat.id}" class="cat-booking-row-label" style="margin:0;">${esc(cat.name)}</label>
+        </div>
+        <div class="cat-booking-sub" id="cat-sub-${cat.id}" style="${isSelected?'':'display:none'}">
+          ${isConsoleOrController ? `
+            <label for="cat-count-${cat.id}">How many? *</label>
+            <input type="number" id="cat-count-${cat.id}" min="1" value="1" placeholder="Count" style="max-width:100px;" />
+          ` : ''}
+          ${isGames ? `
+            <label for="cat-game-${cat.id}">Which game(s)?</label>
+            <input type="text" id="cat-game-${cat.id}" placeholder="e.g., FIFA 24, Spider-Man 2" />
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Populate package dropdown
+  const pkgSel = document.getElementById('bf-package');
+  pkgSel.innerHTML = '<option value="">Select a package…</option>' +
+    packages.map(p => `<option value="${p.id}" ${p.id===selectedPlayerPackageId?'selected':''}>${esc(p.name)}</option>`).join('') +
+    '<option value="custom">Custom / Other</option>';
+
+  // Show booking form view
+  document.getElementById('player-view').classList.add('hidden');
+  document.getElementById('booking-form-view').classList.remove('hidden');
+  window.scrollTo(0,0);
+};
+
+G.toggleCatBookingRow = function(catId) {
+  const chk = document.getElementById('cat-chk-' + catId);
+  const sub = document.getElementById('cat-sub-' + catId);
+  if (sub) sub.style.display = chk.checked ? 'block' : 'none';
+};
+
+G.submitBookingEnquiry = async function() {
+  const name     = document.getElementById('bf-fullname').value.trim();
+  const mobile   = document.getElementById('bf-mobile').value.trim();
+  const social   = document.getElementById('bf-social').value.trim();
+  const start    = document.getElementById('bf-start').value;
+  const end      = document.getElementById('bf-end').value;
+  const address  = document.getElementById('bf-address').value.trim();
+  const landmark = document.getElementById('bf-landmark').value.trim();
+  const pkgVal   = document.getElementById('bf-package').value;
+  const tncOk    = document.getElementById('bf-tnc').checked;
+
+  if (!name)    { showToast('Full name is required.', 'error'); return; }
+  if (!mobile || mobile.length !== 10) { showToast('Enter a valid 10-digit mobile number.', 'error'); return; }
+  if (!social)  { showToast('Social media profile link is required.', 'error'); return; }
+  if (!start)   { showToast('Start date is required.', 'error'); return; }
+  if (!end)     { showToast('End date is required.', 'error'); return; }
+  if (!address) { showToast('Delivery address is required.', 'error'); return; }
+  if (!pkgVal)  { showToast('Please select a package.', 'error'); return; }
+  if (!tncOk)   { showToast('Please accept the Terms & Conditions.', 'error'); return; }
+
+  // Gather categories
+  const selectedCats = [];
+  categories.forEach(cat => {
+    const chk = document.getElementById('cat-chk-' + cat.id);
+    if (chk && chk.checked) {
+      const countEl = document.getElementById('cat-count-' + cat.id);
+      const gameEl  = document.getElementById('cat-game-' + cat.id);
+      selectedCats.push({
+        categoryId:   cat.id,
+        categoryName: cat.name,
+        count: countEl ? parseInt(countEl.value)||1 : null,
+        gameNames: gameEl ? gameEl.value.trim() : null,
+      });
+    }
+  });
+  if (!selectedCats.length) { showToast('Please select at least one category.', 'error'); return; }
+
+  const pkgName = pkgVal === 'custom' ? 'Custom' :
+    (packages.find(p => p.id === pkgVal)?.name || pkgVal);
+
+  // Generate booking ID
+  const today = new Date();
+  const datePart = today.toISOString().slice(0,10).replace(/-/g,'');
+  const rand = Math.random().toString(36).slice(2,6).toUpperCase();
+  const bookingId = `EPIC-${datePart}-${rand}`;
+
+  const data = {
+    bookingId,
+    bookingDate: today.toISOString().slice(0,10),
+    playerName:  name,
+    mobile,
+    socialLink:  social,
+    startDate:   start,
+    endDate:     end,
+    address,
+    landmark,
+    packageChosen: pkgName,
+    categories:    selectedCats,
+    categoryName:  selectedCats[0]?.categoryName || '',
+    status:        'pending',
+    packageFinalised: '',
+    priceInclDelivery: null,
+    createdAt: serverTimestamp(),
+  };
+
+  try {
+    const ref = await addDoc(collection(db, 'bookings'), data);
+    bookings.push({ id: ref.id, ...data });
+    document.getElementById('success-booking-ref').textContent = bookingId;
+    openModal('booking-success-modal');
+  } catch(e) {
+    showToast('Error submitting: ' + e.message, 'error');
+  }
+};
+
+// ============================================================
+// ADMIN
+// ============================================================
+async function initAdminView(user) {
+  currentUser = user;
+  document.getElementById('admin-email-label').textContent = user.email;
+  updateThemeIcons();
+  await Promise.all([loadCategories(), loadInventory(), loadBookings(), loadPackages()]);
+  renderBookingStats();
+  renderBookingsTable();
+  renderInventoryTable();
+  renderAdminPackages();
+  populateFilterDropdowns();
+  const now = new Date();
+  calYear = now.getFullYear(); calMonth = now.getMonth();
+  renderCalendar();
+}
+
+// ---- BOOKINGS ----
+function renderBookingStats() {
+  const total     = bookings.length;
+  const pending   = bookings.filter(b => b.status==='pending').length;
+  const confirmed = bookings.filter(b => b.status==='confirmed').length;
+  const rejected  = bookings.filter(b => b.status==='rejected').length;
+  document.getElementById('booking-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value">${total}</div></div>
+    <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value" style="color:var(--warn)">${pending}</div></div>
+    <div class="stat-card"><div class="stat-label">Confirmed</div><div class="stat-value" style="color:var(--success)">${confirmed}</div></div>
+    <div class="stat-card"><div class="stat-label">Rejected</div><div class="stat-value" style="color:var(--danger)">${rejected}</div></div>
+  `;
+}
+
+G.renderBookingsTable = function() {
+  const nameF   = (document.getElementById('bf-name-f')?.value  || '').toLowerCase();
+  const statusF =  document.getElementById('bf-status-f')?.value || '';
+  const catF    =  document.getElementById('bf-cat-f')?.value    || '';
+  const filtered = bookings.filter(b =>
+    (!nameF   || b.playerName?.toLowerCase().includes(nameF)) &&
+    (!statusF || b.status === statusF) &&
+    (!catF    || b.categoryName === catF)
+  );
+  const tbody = document.getElementById('bookings-tbody');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="13"><div class="empty-state"><div class="icon">📋</div><p>No bookings found.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(b => `
+    <tr>
+      <td><code style="font-size:11px;">${esc(b.bookingId||b.id.slice(0,8))}</code></td>
+      <td style="white-space:nowrap;">${esc(b.bookingDate||'')}</td>
+      <td>${esc(b.categoryName||'')}</td>
+      <td><strong>${esc(b.playerName||'')}</strong></td>
+      <td>${esc(b.mobile||'')}</td>
+      <td style="max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${esc(b.address||'')}">${esc(b.address||'')}</td>
+      <td style="white-space:nowrap;">${esc(b.startDate||'')}</td>
+      <td style="white-space:nowrap;">${esc(b.endDate||'')}</td>
+      <td style="max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(b.packageChosen||'')}</td>
+      <td><span class="badge badge-${b.status||'pending'}">${b.status||'pending'}</span></td>
+      <td style="max-width:110px;">${esc(b.packageFinalised||'—')}</td>
+      <td>${b.priceInclDelivery ? '₹'+Number(b.priceInclDelivery).toLocaleString('en-IN') : '—'}</td>
+      <td>
+        <div class="actions-row">
+          ${b.status!=='confirmed' ? `<button class="btn btn-success btn-sm" onclick="confirmBooking('${b.id}')">✓</button>` : ''}
+          ${b.status!=='rejected'  ? `<button class="btn btn-danger btn-sm"  onclick="rejectBooking('${b.id}')">✕</button>`  : ''}
+          <button class="btn btn-ghost btn-sm" onclick="openAdminBookingModal('${b.id}')">✏️</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+};
+
+G.confirmBooking = function(id) {
+  openAssignModal(id);
+};
+
+// ---- ASSIGN PRODUCTS MODAL ----
+G.openAssignModal = function(id) {
+  const b = bookings.find(x => x.id === id);
+  if (!b) return;
+
+  document.getElementById('assign-booking-id').value = id;
+  document.getElementById('assign-pkg-final').value   = b.packageFinalised || b.packageChosen || '';
+  document.getElementById('assign-price-final').value = b.priceInclDelivery || '';
+
+  // Summary bar
+  document.getElementById('assign-summary-bar').innerHTML = `
+    <span>Player: <strong>${esc(b.playerName||'')}</strong></span>
+    <span>Dates: <strong>${esc(b.startDate||'')} → ${esc(b.endDate||'')}</strong></span>
+    <span>Category: <strong>${esc(b.categoryName||'')}</strong></span>
+    <span>Package: <strong>${esc(b.packageChosen||'—')}</strong></span>
+  `;
+
+  // Determine which categories this booking covers
+  // Use b.categories array if present (multi-cat from player form), else fall back to single categoryName
+  const bookingCats = (b.categories && b.categories.length)
+    ? b.categories
+    : [{ categoryName: b.categoryName, categoryId: b.categoryId, count: 1 }];
+
+  const startDate = parseDate(b.startDate);
+  const endDate   = parseDate(b.endDate);
+
+  // Already-assigned product ids for pre-checking
+  const alreadyAssigned = (b.assignedProducts || []).map(ap => ap.productId);
+
+  const body = document.getElementById('assign-categories-body');
+  body.innerHTML = '';
+
+  bookingCats.forEach(catEntry => {
+    const catName  = catEntry.categoryName;
+    const needed   = catEntry.count || 1;
+    const gameNote = catEntry.gameNames ? ` — Games: ${catEntry.gameNames}` : '';
+
+    // Get inventory items in this category
+    const catItems = inventory.filter(i => i.categoryName === catName);
+
+    // For each item, check conflicts with OTHER confirmed bookings (excluding current)
+    const itemsWithStatus = catItems.map(item => {
+      const conflict = bookings.find(bk =>
+        bk.id !== id &&
+        bk.status === 'confirmed' &&
+        (bk.assignedProducts || []).some(ap => ap.productId === item.id) &&
+        datesOverlap(parseDate(bk.startDate), parseDate(bk.endDate), startDate, endDate)
+      );
+      const isAlreadyAssigned = alreadyAssigned.includes(item.id);
+      return { ...item, conflict: !!conflict, isAlreadyAssigned };
+    });
+
+    const availCount = itemsWithStatus.filter(i => !i.conflict && i.status !== 'maintenance').length;
+    const warnClass  = availCount < needed ? 'style="color:var(--warn)"' : '';
+
+    const block = document.createElement('div');
+    block.className = 'assign-cat-block';
+    block.innerHTML = `
+      <div class="assign-cat-title">${esc(catName)}</div>
+      <div class="assign-cat-meta">
+        Needs: <strong>${needed}</strong> unit(s)${gameNote} &nbsp;|&nbsp;
+        <span ${warnClass}>Available on dates: <strong>${availCount}</strong></span>
+        ${availCount < needed ? `<span class="assign-count-badge">⚠ Only ${availCount} free</span>` : ''}
+      </div>
+      ${itemsWithStatus.length === 0
+        ? `<div class="text-sm text-muted">No products in this category yet.</div>`
+        : itemsWithStatus.map(item => {
+            const statusLabel = item.conflict ? 'Booked' : (item.status === 'maintenance' ? 'Maintenance' : 'Available');
+            const statusClass = item.conflict ? 'assign-busy' : (item.status === 'maintenance' ? 'assign-maint' : 'assign-avail');
+            const disabled    = (item.conflict || item.status === 'maintenance') && !item.isAlreadyAssigned ? 'disabled' : '';
+            const colour      = productColourMap[item.id] || '#888';
+            return `
+              <div class="assign-product-row">
+                <input type="checkbox" class="assign-prod-chk"
+                  data-prod-id="${item.id}"
+                  data-prod-name="${esc(item.name)}"
+                  data-cat-name="${esc(catName)}"
+                  ${item.isAlreadyAssigned ? 'checked' : ''}
+                  ${disabled} />
+                <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${colour};flex-shrink:0;"></span>
+                <span class="assign-product-label">${esc(item.name)}</span>
+                <span class="assign-product-status ${statusClass}">${statusLabel}</span>
+              </div>`;
+          }).join('')
+      }
+    `;
+    body.appendChild(block);
+  });
+
+  openModal('assign-modal');
+};
+
+G.saveAssignAndConfirm = async function() {
+  const id       = document.getElementById('assign-booking-id').value;
+  const pkgFinal = document.getElementById('assign-pkg-final').value.trim();
+  const price    = parseFloat(document.getElementById('assign-price-final').value) || null;
+
+  if (!price) { showToast('Please enter the price including delivery.', 'error'); return; }
+
+  // Gather checked products
+  const checked = [...document.querySelectorAll('.assign-prod-chk:checked')];
+  if (!checked.length) { showToast('Please assign at least one product.', 'error'); return; }
+
+  const assignedProducts = checked.map(chk => ({
+    productId:    chk.dataset.prodId,
+    productName:  chk.dataset.prodName,
+    categoryName: chk.dataset.catName,
+  }));
+
+  try {
+    await updateDoc(doc(db, 'bookings', id), {
+      status:             'confirmed',
+      assignedProducts,
+      packageFinalised:   pkgFinal,
+      priceInclDelivery:  price,
+    });
+
+    const b = bookings.find(x => x.id === id);
+    if (b) {
+      b.status = 'confirmed';
+      b.assignedProducts     = assignedProducts;
+      b.packageFinalised     = pkgFinal;
+      b.priceInclDelivery    = price;
+    }
+
+    closeModal('assign-modal');
+    await syncInventoryFromBookings();
+    afterBookingUpdate();
+    showToast('Booking confirmed and products assigned! 🎮', 'success');
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+};
+
+G.rejectBooking = async function(id) {
+  if (!confirm('Reject this booking?')) return;
+  try {
+    await updateDoc(doc(db,'bookings',id), { status:'rejected' });
+    const b = bookings.find(x=>x.id===id);
+    if (b) b.status = 'rejected';
+    afterBookingUpdate();
+    showToast('Booking rejected.', 'success');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+};
+
+function afterBookingUpdate() {
+  renderBookingStats();
+  renderBookingsTable();
+  renderCalendar();
+  syncInventoryFromBookings();
+}
+
+async function syncInventoryFromBookings() {
+  // FIX 2+3: Use assignedProducts array; auto-revert items whose booking end date has passed.
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  for (const item of inventory) {
+    // Skip items manually set to maintenance — admin controls those
+    if (item.status === 'maintenance') continue;
+
+    // Find any active confirmed booking that has this product assigned AND is ongoing today
+    const activeBooking = bookings.find(b => {
+      if (b.status !== 'confirmed') return false;
+      const assigned = b.assignedProducts || [];
+      if (!assigned.some(ap => ap.productId === item.id)) return false;
+      const s = parseDate(b.startDate);
+      const e = parseDate(b.endDate);
+      return s && e && s <= today && e >= today; // today falls within the rental window
+    });
+
+    // FIX: Future confirmed bookings keep inventory "available" until their start date;
+    // past/current active ones mark it "rented"; expired ones revert to "available"
+    const newStatus = activeBooking ? 'rented' : 'available';
+
+    if (item.status !== newStatus) {
+      try {
+        await updateDoc(doc(db, 'inventory', item.id), { status: newStatus });
+        item.status = newStatus;
+      } catch(e) { /* silent — don't block UI */ }
+    }
+  }
+  renderInventoryTable();
+}
+
+G.openAdminBookingModal = function(id, confirmMode) {
+  const b = id ? bookings.find(x=>x.id===id) : null;
+  document.getElementById('admin-book-modal-title').textContent = b ? (confirmMode ? 'Confirm Booking' : 'Edit Booking') : 'Add Booking';
+  document.getElementById('ab-id').value          = id || '';
+  document.getElementById('ab-name').value        = b?.playerName || '';
+  document.getElementById('ab-mobile').value      = b?.mobile     || '';
+  document.getElementById('ab-social').value      = b?.socialLink || '';
+  document.getElementById('ab-address').value     = b?.address    || '';
+  document.getElementById('ab-landmark').value    = b?.landmark   || '';
+  document.getElementById('ab-start').value       = b?.startDate  || '';
+  document.getElementById('ab-end').value         = b?.endDate    || '';
+  document.getElementById('ab-package-sel').value = b?.packageChosen || '';
+  document.getElementById('ab-pkg-final').value   = b?.packageFinalised || '';
+  document.getElementById('ab-price-final').value = b?.priceInclDelivery || '';
+  document.getElementById('ab-status').value      = confirmMode ? 'confirmed' : (b?.status || 'pending');
+
+  // Category dropdown
+  const catSel = document.getElementById('ab-cat');
+  catSel.innerHTML = '<option value="">— Select —</option>' +
+    categories.map(c => `<option value="${c.id}" data-name="${esc(c.name)}" ${b?.categoryId===c.id?'selected':''}>${esc(c.name)}</option>`).join('');
+
+  openModal('admin-booking-modal');
+};
+
+G.saveAdminBooking = async function() {
+  const id       = document.getElementById('ab-id').value;
+  const catSel   = document.getElementById('ab-cat');
+  const catId    = catSel.value;
+  const catName  = catSel.options[catSel.selectedIndex]?.dataset.name || '';
+  const name     = document.getElementById('ab-name').value.trim();
+  const mobile   = document.getElementById('ab-mobile').value.trim();
+  const social   = document.getElementById('ab-social').value.trim();
+  const address  = document.getElementById('ab-address').value.trim();
+  const landmark = document.getElementById('ab-landmark').value.trim();
+  const start    = document.getElementById('ab-start').value;
+  const end      = document.getElementById('ab-end').value;
+  const pkgSel   = document.getElementById('ab-package-sel').value;
+  const pkgFin   = document.getElementById('ab-pkg-final').value.trim();
+  const price    = parseFloat(document.getElementById('ab-price-final').value)||null;
+  const status   = document.getElementById('ab-status').value;
+
+  if (!name) { showToast('Player name required.', 'error'); return; }
+
+  // Auto-gen bookingId for new entries
+  const today = new Date();
+  const datePart = today.toISOString().slice(0,10).replace(/-/g,'');
+  const rand = Math.random().toString(36).slice(2,6).toUpperCase();
+  const newBookingId = `EPIC-${datePart}-${rand}`;
+
+  const data = {
+    playerName: name, mobile, socialLink: social,
+    address, landmark, startDate: start, endDate: end,
+    categoryId: catId, categoryName: catName,
+    packageChosen: pkgSel,
+    packageFinalised: pkgFin, priceInclDelivery: price,
+    status,
+  };
+
+  try {
+    if (id) {
+      await updateDoc(doc(db,'bookings',id), data);
+      const idx = bookings.findIndex(x=>x.id===id);
+      if (idx > -1) bookings[idx] = { ...bookings[idx], ...data };
+      showToast('Booking updated!','success');
+    } else {
+      data.bookingId = newBookingId;
+      data.bookingDate = today.toISOString().slice(0,10);
+      data.createdAt = serverTimestamp();
+      const ref = await addDoc(collection(db,'bookings'), data);
+      bookings.push({ id: ref.id, ...data });
+      showToast('Booking added!','success');
+    }
+    closeModal('admin-booking-modal');
+    afterBookingUpdate();
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+};
+
+// Export XLS
+G.exportBookingsXLS = function() {
+  if (typeof XLSX === 'undefined') { showToast('SheetJS not loaded.','error'); return; }
+  const rows = bookings.map(b => ({
+    'Booking ID':     b.bookingId || b.id,
+    'Booking Date':   b.bookingDate || '',
+    'Player Name':    b.playerName || '',
+    'Mobile':         b.mobile || '',
+    'Social Link':    b.socialLink || '',
+    'Category':       b.categoryName || '',
+    'Package Chosen': b.packageChosen || '',
+    'Start Date':     b.startDate || '',
+    'End Date':       b.endDate || '',
+    'Address':        b.address || '',
+    'Landmark':       b.landmark || '',
+    'Status':         b.status || '',
+    'Pkg Finalised':  b.packageFinalised || '',
+    'Price incl. Delivery': b.priceInclDelivery || '',
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'EPIC Bookings');
+  XLSX.writeFile(wb, 'EPIC_Bookings.xlsx');
+  showToast('Exported!','success');
+};
+
+// ---- INVENTORY ----
+G.renderInventoryTable = function() {
+  const nameF   = (document.getElementById('if-name')?.value   || '').toLowerCase();
+  const catF    =  document.getElementById('if-cat')?.value    || '';
+  const statusF =  document.getElementById('if-status')?.value || '';
+  const tagF    = (document.getElementById('if-tag')?.value    || '').toLowerCase();
+  const filtered = inventory.filter(i =>
+    (!nameF   || i.name?.toLowerCase().includes(nameF)) &&
+    (!catF    || i.categoryName === catF) &&
+    (!statusF || i.status === statusF) &&
+    (!tagF    || i.tag?.toLowerCase().includes(tagF))
+  );
+  const tbody = document.getElementById('inventory-tbody');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">📦</div><p>No items found.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(item => `
+    <tr>
+      <td>
+        <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${productColourMap[item.id]||'#888'};margin-right:8px;vertical-align:middle;"></span>
+        <strong>${esc(item.name||'')}</strong>
+      </td>
+      <td>${esc(item.categoryName||'')}</td>
+      <td style="max-width:200px;font-size:12px;color:var(--text-2);">${esc(item.description||'')}</td>
+      <td>${item.tag?`<span class="badge" style="background:var(--orange-dim);color:var(--orange);">${esc(item.tag)}</span>`:'—'}</td>
+      <td><span class="badge badge-${item.status||'available'}">${item.status||'available'}</span></td>
+      <td>
+        <div class="actions-row">
+          <button class="btn btn-ghost btn-sm" onclick="openInventoryModal('${item.id}')">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteInventoryItem('${item.id}')">🗑</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+};
+
+G.openInventoryModal = function(id) {
+  const item = id ? inventory.find(x=>x.id===id) : null;
+  document.getElementById('inv-modal-title').textContent = item ? 'Edit Item' : 'Add Inventory Item';
+  document.getElementById('inv-id').value     = id || '';
+  document.getElementById('inv-name').value   = item?.name        || '';
+  document.getElementById('inv-desc').value   = item?.description || '';
+  document.getElementById('inv-tag').value    = item?.tag         || '';
+  document.getElementById('inv-status').value = item?.status      || 'available';
+  const sel = document.getElementById('inv-category');
+  sel.innerHTML = categories.map(c =>
+    `<option value="${c.id}" data-name="${esc(c.name)}" ${item?.categoryId===c.id?'selected':''}>${esc(c.name)}</option>`
+  ).join('');
+  openModal('inventory-modal');
+};
+
+G.saveInventoryItem = async function() {
+  const id     = document.getElementById('inv-id').value;
+  const catSel = document.getElementById('inv-category');
+  const catId  = catSel.value;
+  const catName= catSel.options[catSel.selectedIndex]?.dataset.name || '';
+  const name   = document.getElementById('inv-name').value.trim();
+  const desc   = document.getElementById('inv-desc').value.trim();
+  const tag    = document.getElementById('inv-tag').value.trim();
+  const status = document.getElementById('inv-status').value;
+  if (!name)  { showToast('Product name required.','error'); return; }
+  if (!catId) { showToast('Select a category.','error'); return; }
+  const data = { categoryId:catId, categoryName:catName, name, description:desc, tag, status };
+  try {
+    if (id) {
+      await updateDoc(doc(db,'inventory',id), data);
+      const idx = inventory.findIndex(x=>x.id===id);
+      if (idx > -1) inventory[idx] = { id, ...data };
+      showToast('Item updated!','success');
+    } else {
+      const ref = await addDoc(collection(db,'inventory'), { ...data, createdAt:serverTimestamp() });
+      inventory.push({ id:ref.id, ...data });
+      productColourMap[ref.id] = PRODUCT_COLOURS[inventory.length % PRODUCT_COLOURS.length];
+      showToast('Item added!','success');
+    }
+    renderInventoryTable();
+    closeModal('inventory-modal');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+};
+
+G.deleteInventoryItem = async function(id) {
+  if (!confirm('Delete this item?')) return;
+  try {
+    await deleteDoc(doc(db,'inventory',id));
+    inventory = inventory.filter(x=>x.id!==id);
+    renderInventoryTable();
+    showToast('Deleted.','success');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+};
+
+// ---- PACKAGES ----
+function renderAdminPackages() {
+  const grid = document.getElementById('packages-admin-grid');
+  if (!packages.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="icon">💰</div><p>No packages yet.</p></div>';
+    return;
+  }
+  grid.innerHTML = packages.map(pkg => `
+    <div class="package-card">
+      <div class="package-name">📦 ${esc(pkg.name)}</div>
+      ${pkg.duration?`<div class="text-sm text-muted">${esc(pkg.duration)}</div>`:''}
+      <div class="package-price">₹${(pkg.totalPrice||0).toLocaleString('en-IN')} ${pkg.pricePerDay?`<span>or ₹${pkg.pricePerDay}/day</span>`:''}</div>
+      <div class="package-includes text-sm text-muted">
+        ${(pkg.categoryItems||[]).map(ci=>`✅ ${esc(ci.categoryName)} × ${ci.count}`).join('<br>')}
+        ${pkg.gamesIncluded?'<br>🎮 '+esc(pkg.gamesIncluded):''}
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="btn btn-ghost btn-sm w-full" onclick="openPackageModal('${pkg.id}')">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deletePackage('${pkg.id}')">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+G.openPackageModal = function(id) {
+  const pkg = id ? packages.find(x=>x.id===id) : null;
+  document.getElementById('pkg-modal-title').textContent = pkg ? 'Edit Package' : 'Add Package';
+  document.getElementById('pkg-id').value        = id || '';
+  document.getElementById('pkg-name').value      = pkg?.name          || '';
+  document.getElementById('pkg-games').value     = pkg?.gamesIncluded || '';
+  document.getElementById('pkg-price-day').value = pkg?.pricePerDay   || '';
+  document.getElementById('pkg-total').value     = pkg?.totalPrice    || '';
+  document.getElementById('pkg-duration').value  = pkg?.duration      || '';
+
+  // Category count rows
+  const box = document.getElementById('pkg-cat-counts');
+  box.innerHTML = categories.map(cat => {
+    const existing = pkg?.categoryItems?.find(ci=>ci.categoryName===cat.name);
+    return `
+      <div class="count-row">
+        <input type="checkbox" id="pkgcat-${cat.id}" value="${esc(cat.name)}" ${existing?'checked':''} onchange="togglePkgCount('${cat.id}')" />
+        <label for="pkgcat-${cat.id}" style="margin:0;">${esc(cat.name)}</label>
+        <input type="number" id="pkgcnt-${cat.id}" min="1" value="${existing?.count||1}" placeholder="Count" style="${existing?'':'display:none'}" />
+      </div>
+    `;
+  }).join('');
+  openModal('package-modal');
+};
+
+G.togglePkgCount = function(catId) {
+  const chk = document.getElementById('pkgcat-' + catId);
+  const cnt = document.getElementById('pkgcnt-' + catId);
+  if (cnt) cnt.style.display = chk.checked ? 'inline-block' : 'none';
+};
+
+G.savePackage = async function() {
+  const id       = document.getElementById('pkg-id').value;
+  const name     = document.getElementById('pkg-name').value.trim();
+  const games    = document.getElementById('pkg-games').value.trim();
+  const priceDay = parseFloat(document.getElementById('pkg-price-day').value)||null;
+  const total    = parseFloat(document.getElementById('pkg-total').value)||0;
+  const duration = document.getElementById('pkg-duration').value.trim();
+  const catItems = [];
+  categories.forEach(cat => {
+    const chk = document.getElementById('pkgcat-' + cat.id);
+    const cnt = document.getElementById('pkgcnt-' + cat.id);
+    if (chk?.checked) {
+      catItems.push({ categoryName: cat.name, count: parseInt(cnt?.value)||1 });
+    }
+  });
+  if (!name)           { showToast('Package name required.','error'); return; }
+  if (!catItems.length){ showToast('Select at least one category.','error'); return; }
+  const data = { name, categoryItems:catItems, gamesIncluded:games, pricePerDay:priceDay, totalPrice:total, duration };
+  try {
+    if (id) {
+      await updateDoc(doc(db,'packages',id), data);
+      const idx = packages.findIndex(x=>x.id===id);
+      if (idx > -1) packages[idx] = { id, ...data };
+      showToast('Package updated!','success');
+    } else {
+      const ref = await addDoc(collection(db,'packages'), { ...data, createdAt:serverTimestamp() });
+      packages.push({ id:ref.id, ...data });
+      showToast('Package added!','success');
+    }
+    renderAdminPackages();
+    closeModal('package-modal');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+};
+
+G.deletePackage = async function(id) {
+  if (!confirm('Delete this package?')) return;
+  try {
+    await deleteDoc(doc(db,'packages',id));
+    packages = packages.filter(x=>x.id!==id);
+    renderAdminPackages();
+    showToast('Deleted.','success');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+};
+
+// ---- SCHEDULE ----
+G.switchScheduleView = function(view, el) {
+  scheduleView = view;
+  document.querySelectorAll('.view-toggle-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderCalendar();
+};
+
+G.changeMonth = function(dir) {
+  calMonth += dir;
+  if (calMonth > 11) { calMonth=0; calYear++; }
+  if (calMonth <  0) { calMonth=11; calYear--; }
+  renderCalendar();
+};
+
+function renderCalendar() {
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month-label').textContent = `${monthNames[calMonth]} ${calYear}`;
+
+  // Populate schedule category filter
+  const schedCatF = document.getElementById('sched-cat-f');
+  const prevSchedCat = schedCatF.value;
+  schedCatF.innerHTML = '<option value="">All categories</option>' +
+    categories.map(c=>`<option value="${esc(c.name)}" ${prevSchedCat===c.name?'selected':''}>${esc(c.name)}</option>`).join('');
+
+  // Populate product filter based on selected category
+  const selCat = schedCatF.value;
+  const schedProdF = document.getElementById('sched-prod-f');
+  const prevSchedProd = schedProdF.value;
+  const prodOptions = inventory.filter(i => !selCat || i.categoryName === selCat);
+  schedProdF.innerHTML = '<option value="">All products</option>' +
+    prodOptions.map(i=>`<option value="${esc(i.id)}" ${prevSchedProd===i.id?'selected':''}>${esc(i.name)}</option>`).join('');
+
+  const filterCat  = schedCatF.value;
+  const filterProd = schedProdF.value;
+
+  // Filter bookings by view + filters
+  const filteredBookings = bookings.filter(b => {
+    if (b.status !== scheduleView) return false;
+    if (filterCat  && b.categoryName !== filterCat)  return false;
+    if (filterProd && b.productId    !== filterProd) return false;
+    return true;
+  });
+
+  // Build calendar
+  const grid = document.getElementById('cal-grid');
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let html = dayNames.map(d=>`<div class="cal-day-name">${d}</div>`).join('');
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  for (let i=0; i<firstDay; i++) html += `<div class="cal-cell other-month"></div>`;
+
+  for (let d=1; d<=daysInMonth; d++) {
+    const cellDate = new Date(calYear, calMonth, d);
+    const isToday  = cellDate.getTime() === today.getTime();
+    const dayBookings = filteredBookings.filter(b => {
+      const s = parseDate(b.startDate), e = parseDate(b.endDate);
+      return s && e && cellDate >= s && cellDate <= e;
+    });
+    const eventsHtml = dayBookings.slice(0,3).map(b => {
+      const colour = productColourMap[b.productId] || '#888';
+      const label  = esc((b.playerName||'?').split(' ')[0]) + (b.categoryName?' · '+esc(b.categoryName):'');
+      return `<div class="cal-event" style="background:${colour};" title="${esc(b.playerName)} — ${esc(b.categoryName)}" onclick="openAdminBookingModal('${b.id}')">${label}</div>`;
+    }).join('') + (dayBookings.length>3?`<div class="text-xs text-muted">+${dayBookings.length-3}</div>`:'');
+    html += `<div class="cal-cell ${isToday?'today':''}"><div class="cal-date">${d}</div>${eventsHtml}</div>`;
+  }
+
+  grid.innerHTML = html;
+
+  // Legend — products that appear in filtered bookings
+  const usedProductIds = [...new Set(filteredBookings.map(b=>b.productId).filter(Boolean))];
+  const legendEl = document.getElementById('cal-legend');
+  if (usedProductIds.length) {
+    legendEl.innerHTML = usedProductIds.map(pid => {
+      const item = inventory.find(i=>i.id===pid);
+      const colour = productColourMap[pid]||'#888';
+      return `<div class="cal-legend-item"><div class="cal-legend-dot" style="background:${colour};"></div>${esc(item?.name||pid)}</div>`;
+    }).join('');
+  } else {
+    legendEl.innerHTML = '';
+  }
+}
+
+// Update schedule product filter when category changes
+document.getElementById('sched-cat-f')?.addEventListener('change', function() {
+  renderCalendar();
+});
+
+// ---- FILTER DROPDOWNS ----
+function populateFilterDropdowns() {
+  const bfCat = document.getElementById('bf-cat-f');
+  if (bfCat) bfCat.innerHTML = '<option value="">All categories</option>' +
+    categories.map(c=>`<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
+  const ifCat = document.getElementById('if-cat');
+  if (ifCat) ifCat.innerHTML = '<option value="">All categories</option>' +
+    categories.map(c=>`<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+G.doLogin = async function() {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const btn      = document.getElementById('login-btn');
+  if (!email||!password) { showToast('Enter email and password.','error'); return; }
+  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Signing in…';
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch(e) {
+    showToast('Sign in failed: '+(e.code==='auth/invalid-credential'?'Invalid email or password.':e.message),'error');
+    btn.disabled=false; btn.textContent='Sign in';
+  }
+};
+G.doLogout = async function() { await signOut(auth); };
+
+G.showAdminLogin = function() {
+  ['player-view','admin-view','booking-form-view'].forEach(v=>document.getElementById(v).classList.add('hidden'));
+  document.getElementById('login-view').classList.remove('hidden');
+};
+G.showPlayerView = function() {
+  ['admin-view','login-view','booking-form-view'].forEach(v=>document.getElementById(v).classList.add('hidden'));
+  document.getElementById('player-view').classList.remove('hidden');
+  window.scrollTo(0,0);
+};
+
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    ['login-view','player-view','booking-form-view'].forEach(v=>document.getElementById(v).classList.add('hidden'));
+    document.getElementById('admin-view').classList.remove('hidden');
+    await initAdminView(user);
+  } else {
+    currentUser = null;
+    if (!document.getElementById('login-view').classList.contains('hidden')) return;
+    ['login-view','admin-view','booking-form-view'].forEach(v=>document.getElementById(v).classList.add('hidden'));
+    document.getElementById('player-view').classList.remove('hidden');
+  }
+});
+
+// ============================================================
+// ADMIN TAB SWITCH
+// ============================================================
+G.switchAdminTab = function(tab, el) {
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.admin-panel-wrap').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+};
+
+// ============================================================
+// MODAL HELPERS
+// ============================================================
+G.openModal  = function(id) { document.getElementById(id).classList.remove('hidden'); };
+G.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); };
+G.openTncModal = function() { openModal('tnc-modal'); };
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target===o) o.classList.add('hidden'); });
+});
+
+// ============================================================
+// THEME TOGGLE
+// ============================================================
+G.toggleTheme = function() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme', isDark?'light':'dark');
+  localStorage.setItem('epic-theme', isDark?'light':'dark');
+  updateThemeIcons();
+};
+function updateThemeIcons() {
+  const isDark = document.documentElement.getAttribute('data-theme')==='dark';
+  const icon = isDark?'☀️':'🌙';
+  ['theme-icon','theme-icon-admin','theme-icon-bf'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = icon;
+  });
+}
+(function() {
+  const saved = localStorage.getItem('epic-theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+  updateThemeIcons();
+})();
+
+// ============================================================
+// SIDE MENU
+// ============================================================
+G.openSideMenu  = function() { document.getElementById('sideMenu').classList.add('open'); document.getElementById('sideMenuOverlay').classList.add('open'); };
+G.closeSideMenu = function() { document.getElementById('sideMenu').classList.remove('open'); document.getElementById('sideMenuOverlay').classList.remove('open'); };
+
+// ============================================================
+// FLATPICKR
+// ============================================================
+const startPicker = flatpickr('#start-date', {
+  dateFormat:'Y-m-d', altInput:true, altFormat:'d M Y', minDate:'today',
+  onChange(sel, dateStr) { endPicker.set('minDate', dateStr); }
+});
+const endPicker = flatpickr('#end-date', {
+  dateFormat:'Y-m-d', altInput:true, altFormat:'d M Y', minDate:'today'
+});
+
+// ============================================================
+// TOAST
+// ============================================================
+let toastTimer;
+G.showToast = function(msg, type='info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show '+(type||'');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.className='', 3500);
+};
+
+// ============================================================
+// UTILS
+// ============================================================
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function parseDate(str) {
+  if (!str) return null;
+  const d = new Date(str+'T00:00:00');
+  return isNaN(d) ? null : d;
+}
+function fmtDate(d) {
+  if (!d) return '—';
+  return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+}
+function datesOverlap(s1,e1,s2,e2) {
+  if (!s1||!e1||!s2||!e2) return false;
+  return s1<=e2 && e1>=s2;
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+async function boot() {
+  await seedIfEmpty();
+  await initPlayerView();
+}
+boot().catch(console.error);
+
+window.showToast = G.showToast;
+</script>
+</body>
+</html>
